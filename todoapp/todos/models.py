@@ -1,8 +1,8 @@
 from __future__ import unicode_literals
 
 from django.db import models
-from django.utils.encoding import smart_text as smart_unicode
-from django.utils.translation import ugettext_lazy as _
+from django.utils.encoding import smart_str as smart_unicode
+from django.utils.translation import gettext_lazy as _
 
 
 class Todo(models.Model):
