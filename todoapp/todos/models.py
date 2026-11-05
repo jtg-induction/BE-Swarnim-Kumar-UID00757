@@ -6,13 +6,13 @@ from django.utils.translation import gettext_lazy as _
 
 
 class Todo(models.Model):
-    """
-        Needed fields
-        - user (fk to User Model - Use AUTH_USER_MODEL from django.conf.settings)
-        - name (max_length=1000)
-        - done (boolean with default been false)
-        - date_created (with default of creation time)
-        - date_completed (set it when done is marked true)
+    user = models.ForeignKey(
+        'users.CustomUser', on_delete=models.CASCADE, related_name='todos'
+    )
+    name = models.CharField(max_length=1000)
+    done = models.BooleanField(default=False)
+    date_created = models.DateTimeField(auto_now_add=True)
+    date_completed = models.DateTimeField(null=True, blank=True)
 
-        Add string representation for this model with todos name.
-    """
+    def __str__(self):
+        return self.name

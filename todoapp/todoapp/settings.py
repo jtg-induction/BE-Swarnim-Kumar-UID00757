@@ -11,6 +11,10 @@ https://docs.djangoproject.com/en/1.9/ref/settings/
 """
 
 import os
+from dotenv import load_dotenv
+
+load_dotenv()
+
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
@@ -20,7 +24,7 @@ BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 # See https://docs.djangoproject.com/en/1.9/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'k8b^y952f(10ox6993@h0q3-+&d_r#-g!qu+1zpggva_kux)2x'
+SECRET_KEY = os.getenv('SECRET_KEY')
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
@@ -88,11 +92,11 @@ WSGI_APPLICATION = 'todoapp.wsgi.application'
 DATABASES = {
     u'default': {
         u'ENGINE': u'django.db.backends.postgresql',
-        u'NAME': u'',                      # Add database name.
-        u'USER': u'postgres',              # Add psql user name. For default use postgres.
-        u'PASSWORD': u'',                  # Add user password if exists.
-        u'HOST': u'',                      # Set to empty string for localhost..
-        u'PORT': u'5432',                  # Psql service running port.
+        u'NAME': os.getenv('DB_NAME'),                      # Add database name.
+        u'USER': os.getenv('DB_USER'),              # Add psql user name. For default use postgres.
+        u'PASSWORD': os.getenv('DB_USER_PASSWORD'),                  # Add user password if exists.
+        u'HOST': os.getenv('DB_HOST'),                      # Set to empty string for localhost..
+        u'PORT': os.getenv('DB_DB_PORT'),                  # Psql service running port.
     },
 }
 
