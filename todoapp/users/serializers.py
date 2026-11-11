@@ -62,4 +62,4 @@ class UserWiseProjectSerializer(serializers.ModelSerializer):
             'to_do_projects',
             'in_progress_projects',
             'completed_projects'
-        ]
+    ]
