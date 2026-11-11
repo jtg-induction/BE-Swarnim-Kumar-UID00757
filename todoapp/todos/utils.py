@@ -1,4 +1,13 @@
 import json
+from django.contrib.auth import get_user_model
+from todos.models import Todo
+from projects.models import Project
+from django.core import serializers
+from todos import serializers as todo_serializers
+from django.db.models import Count, Q, Prefetch, Value
+from django.contrib.postgres.aggregates import ArrayAgg
+from users import serializers as user_serializers
+from projects import serializers as project_serializers
 # Add code to this util to return all users list in specified format.
 # [ {
 #   "id": 1,
@@ -14,15 +23,17 @@ import json
 # }]
 # Note: use serializer for generating this format.
 # use json.load(json.dumps(serializer.data)) while returning data from this function for test cases to pass.
+User = get_user_model()
 
 def fetch_all_users():
     """
     Util to fetch given user's tod list
     :return: list of dicts - List of users data
     """
-    # Write your code here
-    pass
+    users = User.objects.all()
 
+    serializer = user_serializers.UserSerializer(users, many=True)
+    return json.loads(json.dumps(serializer.data))
 
 # Add code to this util to  return all todos list (done/to do) along with user details in specified format.
 # [{
@@ -54,8 +65,11 @@ def fetch_all_todo_list_with_user_details():
     Util to fetch given user's tod list
     :return: list of dicts - List of todos
     """
-    # Write your code here
-    pass
+
+    todos = Todo.objects.select_related('user').all()
+
+    serializer = todo_serializers.TodoSerializer(todos, many=True)
+    return json.loads(json.dumps(serializer.data))
 
 
 # Add code to this util to return all projects with following details in specified format.
@@ -81,7 +95,7 @@ def fetch_projects_details():
     :return: list of dicts - List of project with details
     """
     # Write your code here
-    pass
+    
 
 
 # Add code to this util to  return stats (done & to do count) of all users in specified format.
@@ -108,8 +122,15 @@ def fetch_users_todo_stats():
     Util to fetch todos list stats of all users on platform
     :return: list of dicts -  List of users with stats
     """
-    # Write your code here
-    pass
+    
+    users_stats = User.objects.annotate(
+        completed_count = Count("todos", filter=Q(todos__done=True)),
+        pending_count = Count("todos", filter=Q(todos__done=False))
+    )
+
+    serializer = user_serializers.TodoStatsSerializer(users_stats, many=True)
+    return json.loads(json.dumps(serializer.data))
+
 
 
 # Add code to this util to return top five users with maximum number of pending todos in specified format.
@@ -134,8 +155,13 @@ def fetch_five_users_with_max_pending_todos():
     Util to fetch top five user with maximum number of pending todos
     :return: list of dicts -  List of users
     """
-    # Write your code here
-    pass
+    
+    users = User.objects.annotate(
+        pending_count = Count("todos", filter=Q(todos__done=False))
+    ).order_by('-pending_count')[:5]
+
+    serializer = user_serializers.UserPendingTodosSerializer(users, many=True)
+    return json.loads(json.dumps(serializer.data))
 
 
 # Add code to this util to return users with given number of pending todos in specified format.
@@ -163,8 +189,13 @@ def fetch_users_with_n_pending_todos(n):
     :param n: integer - count of pending todos
     :return: list of dicts -  List of users
     """
-    # Write your code here
-    pass
+
+    users = User.objects.annotate(
+        pending_count = Count("todos", filter=Q(todos__done=False))
+    ).filter(pending_count=n)
+
+    serializer = user_serializers.UserPendingTodosSerializer(users, many=True)
+    return json.loads(json.dumps(serializer.data))
 
 
 # Add code to this util to return todos that were created in between given dates (add proper order too) and marked as
@@ -268,8 +299,19 @@ def fetch_project_wise_report():
     Util to fetch project wise todos pending &  count per user.
     :return: list of dicts - List of report data
     """
-    # Write your code here
-    pass
+    
+    annotated_members_queryset = User.objects.annotate(
+        completed_count = Count('todos', filter=Q(todos__done=True)),
+        pending_count = Count('todos', filter=Q(todos__done=False))
+    ).order_by('first_name', 'last_name', 'email')
+
+    project = Project.objects.prefetch_related(
+        Prefetch('members', queryset=annotated_members_queryset)
+    ).order_by('name')
+
+    serializer = project_serializers.ProjectReportSerializer(project, many=True)
+    return json.loads(json.dumps(serializer.data))
+
 
 
 # Add code to this util to return all users project stats in specified format.
@@ -301,6 +343,21 @@ def fetch_user_wise_project_status():
     Util to fetch user wise project statuses.
     :return: list of dicts - List of user project data
     """
-    # Write your code here
-    pass
 
+    users = User.objects.annotate(
+        to_do_projects = ArrayAgg(
+            'projects__name', 
+            filter=Q(projects__status=0),
+            default=Value([])),
+        in_progress_projects = ArrayAgg(
+            'projects__name',
+            filter=Q(projects__status=1),
+            default=Value([])),
+        completed_projects = ArrayAgg(
+            'projects__name',
+            filter=Q(projects__status=2),
+            default=Value([]))
+    )
+
+    serializer = user_serializers.UserWiseProjectSerializer(users, many=True)
+    return json.loads(json.dumps(serializer.data))
