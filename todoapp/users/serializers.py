@@ -5,7 +5,9 @@ from django.utils.translation import gettext_lazy as _
 
 from rest_framework import serializers
 from rest_framework.authtoken.models import Token
+from rest_framework.exceptions import AuthenticationFailed
 
+from users.constants import ValidationError
 
 User = get_user_model()
 
@@ -63,3 +65,51 @@ class UserWiseProjectSerializer(serializers.ModelSerializer):
             'in_progress_projects',
             'completed_projects'
     ]
+
+class UserRegisterSerializer(serializers.ModelSerializer):
+    token = serializers.SerializerMethodField(read_only=True)
+    password = serializers.CharField(write_only=True)
+
+    class Meta:
+        model = User
+        fields = [
+            'first_name',
+            'last_name',
+            'email',
+            'password',
+            'date_joined',
+            'token'
+        ]
+        read_only_fields = [
+            'id',
+            'date_joined',
+            'token'
+        ]
+
+    def get_token(self, user):
+        token, created = Token.objects.get_or_create(user=user)
+        return token.key
+
+    def create(self, data):
+        return User.objects.create_user(**data)
+
+class UserLoginSerializer(serializers.Serializer):
+    email = serializers.EmailField(write_only=True)
+    password = serializers.CharField(write_only=True)
+
+    def validate(self, attrs):
+        email = attrs.get('email')
+        password = attrs.get('password')
+
+        user = authenticate(
+            username=email,
+            password=password
+        )
+
+        if not user:
+            raise AuthenticationFailed(
+                {'error': ValidationError.INVALID_CREDENTIALS}
+            )
+        
+        attrs['user'] = user
+        return attrs
