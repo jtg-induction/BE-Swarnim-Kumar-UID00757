@@ -19,7 +19,7 @@ def custom_exception_handler(exc, context):
             message = str(response.data["detail"])
             errors = None
         else:
-            message = str(response.data)
+            message = str(response.data['error'])
             errors = None
 
     response.data = {

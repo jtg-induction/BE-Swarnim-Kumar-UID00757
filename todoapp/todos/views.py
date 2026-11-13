@@ -1,3 +1,4 @@
+from rest_framework import permissions
 from rest_framework.pagination import PageNumberPagination
 from rest_framework.viewsets import ModelViewSet
 
@@ -30,13 +31,10 @@ class TodoAPIViewSet(ModelViewSet):
     
     serializer_class = TodoAPISerializer
     pagination_class = StandardTodoResultsPagination
+    permission_classes = [permissions.IsAuthenticated]
 
     def get_queryset(self):
-        queryset = Todo.objects.all().order_by('-date_created')
+        return Todo.objects.filter(user=self.request.user)
 
-        if self.action == 'list':
-            user_id = self.request.data.get('user_id')
-            if user_id is not None:
-                queryset = queryset.filter(user_id=user_id)
-
-        return queryset
+    def perform_create(self, serializer):
+        serializer.save(user=self.request.user)
