@@ -26,10 +26,10 @@ class TodoSerializer(serializers.ModelSerializer):
 
 class TodoAPISerializer(serializers.ModelSerializer):
     user_id = serializers.PrimaryKeyRelatedField(
-        queryset=User.objects.all(), source='user'
+        source='user',
+        read_only=True
     )
 
     class Meta:
         model = models.Todo
         fields = ["id", "user_id", "name", "done", "date_created"]
-        
