@@ -2,6 +2,7 @@ from django.contrib.auth import get_user_model
 
 from rest_framework import serializers
 
+from projects.constants import ValidationError
 from projects.models import Project
 
 User = get_user_model()
@@ -31,4 +32,20 @@ class ProjectReportSerializer(serializers.ModelSerializer):
     class Meta:
         model = Project
         fields = ['project_title', 'report']
+
+class ProjectAddMemberSerializer(serializers.Serializer):
+    user_ids = serializers.ListField(
+        child = serializers.IntegerField(min_value=1),
+        allow_empty = False,
+        max_length = 100,
+        min_length = 1,
+        error_messages = {
+            "min_length": ValidationError.USERS_IDS_MINIMUM_LIMIT,
+            "max_length": ValidationError.USERS_IDS_MAXIMUM_LIMIT,
+            "empty": ValidationError.USERS_IDS_MINIMUM_LIMIT
+        }
+    )
+
+    def validate_user_ids(self, data):
+        return list(dict.fromkeys(data, None))
 
