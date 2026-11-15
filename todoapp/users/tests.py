@@ -27,9 +27,10 @@ class UserRegistrationAPIViewTestCase(APITestCase):
         Test to verify that a post call with user valid data
         """
         user_data = {
+            "first_name": "john",
+            "last_name": "snow",
             "email": "test@testuser.com",
             "password": "123123",
-            "confirm_password": "123123"
         }
         response = self.client.post(self.url, user_data)
         self.assertEqual(201, response.status_code)
@@ -40,6 +41,8 @@ class UserRegistrationAPIViewTestCase(APITestCase):
         Test to verify that a post call with already exists email
         """
         user_data_1 = {
+            "first_name": "john",
+            "last_name": "snow",
             "email": "test@testuser.com",
             "password": "123123",
             "confirm_password": "123123"
@@ -48,6 +51,8 @@ class UserRegistrationAPIViewTestCase(APITestCase):
         self.assertEqual(201, response.status_code)
 
         user_data_2 = {
+            "first_name": "john",
+            "last_name": "snow",
             "email": "test@testuser.com",
             "password": "123123",
             "confirm_password": "123123"
@@ -70,7 +75,7 @@ class UserLoginAPIViewTestCase(APITestCase):
 
     def test_authentication_with_wrong_password(self):
         response = self.client.post(self.url, {"email": self.email, "password": "I_know"})
-        self.assertEqual(400, response.status_code)
+        self.assertEqual(401, response.status_code)
 
     def test_authentication_with_valid_data(self):
         response = self.client.post(self.url, {"email": self.email, "password": self.password})
