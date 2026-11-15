@@ -54,7 +54,6 @@ class ProjectMemberApiView(GenericAPIView):
     serializer_class = ProjectAddMemberSerializer
     permission_classes = [permissions.IsAdminUser]
 
-    # @action(detail=True, methods=["post"], url_path="members")
     def post(self, request, pk=None):
         project_obj = self.get_object()
         serializer = self.get_serializer(data=request.data)
@@ -97,12 +96,14 @@ class ProjectMemberApiView(GenericAPIView):
                     logs[str(uid)] = MemberAddError.USER_ALREADY_MEMBER
                     continue
 
-                if project_counts.get(uid, 0) > MAX_PROJECTS_PER_USER:
+                if project_counts.get(uid, 0) >= MAX_PROJECTS_PER_USER:
                     logs[str(uid)] = MemberAddError.USER_MAX_PROJECT_LIMIT
                     continue
 
                 if remaining_slots <= 0:
-                    logs[str(uid)] = MemberAddError.PROJECT_MAX_LIMIT.format(limit=project.max_members)
+                    logs[str(uid)] = MemberAddError.PROJECT_MAX_LIMIT.format(
+                        limit=project.max_members
+                    )
                     continue
 
                 memberships_to_create.append(
@@ -116,7 +117,6 @@ class ProjectMemberApiView(GenericAPIView):
 
         return Response({"logs": logs})
 
-    # @add_members.mapping.patch
     def patch(self, request, pk=None):
         project_obj = self.get_object()
         serializer = self.get_serializer(data=request.data)
@@ -128,8 +128,13 @@ class ProjectMemberApiView(GenericAPIView):
 
         project = Project.objects.get(pk=project_obj.pk)
 
-        existing_member_ids = ProjectMember.objects.filter(project=project).values_list("member_id", flat=True)
-        existing_user_ids = User.objects.filter(id__in=user_ids).values_list("id", flat=True)
+        existing_member_ids = ProjectMember.objects.filter(
+            project=project
+        ).values_list("member_id", flat=True)
+
+        existing_user_ids = User.objects.filter(
+            id__in=user_ids
+        ).values_list("id", flat=True)
 
         for uid in user_ids:
             if uid not in existing_user_ids:
@@ -145,8 +150,8 @@ class ProjectMemberApiView(GenericAPIView):
 
         if memberships_to_remove:
             ProjectMember.objects.filter(
-                project=project, member_id__in=memberships_to_remove
+                project=project, 
+                member_id__in=memberships_to_remove
             ).delete()
 
         return Response({"logs": logs})
-        
