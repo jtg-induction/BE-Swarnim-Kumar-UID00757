@@ -1,6 +1,9 @@
 from django.contrib.auth import get_user_model
+
 from rest_framework import serializers
+
 from todos import models
+from todos.constants import TODO_TIME_FORMAT, TODO_STATUS_DONE, TODO_STATUS_TO_DO
 
 User = get_user_model()
 
@@ -13,7 +16,7 @@ class TodoSerializer(serializers.ModelSerializer):
     status = serializers.SerializerMethodField()
     created_at = serializers.DateTimeField(
         source='date_created', 
-        format="%I:%M %p, %d %b, %Y"
+        format=TODO_TIME_FORMAT
     )
     creator = TodoCreatorSerializer(source='user', read_only=True)
 
