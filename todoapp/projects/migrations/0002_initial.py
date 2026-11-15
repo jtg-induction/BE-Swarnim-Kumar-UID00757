@@ -2,7 +2,7 @@
 
 from django.conf import settings
 from django.db import migrations, models
-import django.db.models.deletion
+from django.db.models.deletion import CASCADE
 
 
 class Migration(migrations.Migration):
@@ -18,12 +18,12 @@ class Migration(migrations.Migration):
         migrations.AddField(
             model_name='projectmember',
             name='member',
-            field=models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name='project_memberships', to=settings.AUTH_USER_MODEL),
+            field=models.ForeignKey(on_delete=CASCADE, related_name='project_memberships', to=settings.AUTH_USER_MODEL),
         ),
         migrations.AddField(
             model_name='projectmember',
             name='project',
-            field=models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name='project_members', to='projects.project'),
+            field=models.ForeignKey(on_delete=CASCADE, related_name='project_members', to='projects.project'),
         ),
         migrations.AddField(
             model_name='project',
