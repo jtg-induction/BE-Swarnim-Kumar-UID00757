@@ -5,6 +5,8 @@ from rest_framework import serializers
 from todos import models
 from todos.constants import TODO_TIME_FORMAT, TODO_STATUS_DONE, TODO_STATUS_TO_DO
 
+User = get_user_model()
+
 class TodoCreatorSerializer(serializers.ModelSerializer):
     class Meta:
         model = get_user_model()
@@ -23,4 +25,14 @@ class TodoSerializer(serializers.ModelSerializer):
         fields = ["id", "name", "status", "created_at", "creator"]
 
     def get_status(self, obj):
-        return TODO_STATUS_DONE if obj.done else TODO_STATUS_TO_DO
+        return "Done" if obj.done else "To Do"
+
+class TodoAPISerializer(serializers.ModelSerializer):
+    user_id = serializers.PrimaryKeyRelatedField(
+        queryset=User.objects.all(), source='user'
+    )
+
+    class Meta:
+        model = models.Todo
+        fields = ["id", "user_id", "name", "done", "date_created"]
+        
