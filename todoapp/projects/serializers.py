@@ -4,7 +4,6 @@ from rest_framework import serializers
 
 from projects.constants import ValidationError
 from projects.models import Project
-from users.serializers import TodoStatsSerializer
 
 User = get_user_model()
 
