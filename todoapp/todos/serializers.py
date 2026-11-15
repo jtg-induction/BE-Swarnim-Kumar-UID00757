@@ -1,6 +1,9 @@
 from django.contrib.auth import get_user_model
+
 from rest_framework import serializers
+
 from todos import models
+from todos.constants import TODO_TIME_FORMAT, TODO_STATUS_DONE, TODO_STATUS_TO_DO
 
 class TodoCreatorSerializer(serializers.ModelSerializer):
     class Meta:
@@ -11,7 +14,7 @@ class TodoSerializer(serializers.ModelSerializer):
     status = serializers.SerializerMethodField()
     created_at = serializers.DateTimeField(
         source='date_created', 
-        format="%I:%M %p, %d %b, %Y"
+        format=TODO_TIME_FORMAT
     )
     creator = TodoCreatorSerializer(source='user', read_only=True)
 
@@ -20,5 +23,4 @@ class TodoSerializer(serializers.ModelSerializer):
         fields = ["id", "name", "status", "created_at", "creator"]
 
     def get_status(self, obj):
-        return "Done" if obj.done else "To Do"
-    
+        return TODO_STATUS_DONE if obj.done else TODO_STATUS_TO_DO
