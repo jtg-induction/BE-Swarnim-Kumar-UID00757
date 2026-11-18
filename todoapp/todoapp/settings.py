@@ -51,7 +51,7 @@ INSTALLED_APPS = [
 
     'django_nose'
 ]
-AUTH_USER_MODEL = u'users.CustomUser'
+AUTH_USER_MODEL = 'users.CustomUser'
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
@@ -81,8 +81,6 @@ TEMPLATES = [
     },
 ]
 
-TEMPLATE_DEBUG = DEBUG
-
 WSGI_APPLICATION = 'todoapp.wsgi.application'
 
 
@@ -90,13 +88,13 @@ WSGI_APPLICATION = 'todoapp.wsgi.application'
 # https://docs.djangoproject.com/en/1.9/ref/settings/#databases
 
 DATABASES = {
-    u'default': {
-        u'ENGINE': u'django.db.backends.postgresql',
-        u'NAME': os.getenv('DB_NAME'),                      # Add database name.
-        u'USER': os.getenv('DB_USER'),              # Add psql user name. For default use postgres.
-        u'PASSWORD': os.getenv('DB_USER_PASSWORD'),                  # Add user password if exists.
-        u'HOST': os.getenv('DB_HOST'),                      # Set to empty string for localhost..
-        u'PORT': os.getenv('DB_DB_PORT'),                  # Psql service running port.
+    'default': {
+        'ENGINE': 'django.db.backends.postgresql',
+        'NAME': os.getenv('DB_NAME'),                      # Add database name.
+        'USER': os.getenv('DB_USER'),              # Add psql user name. For default use postgres.
+        'PASSWORD': os.getenv('DB_USER_PASSWORD'),                  # Add user password if exists.
+        'HOST': os.getenv('DB_HOST'),                      # Set to empty string for localhost..
+        'PORT': os.getenv('DB_PORT'),                  # Psql service running port.
     },
 }
 
@@ -157,3 +155,5 @@ NOSE_ARGS = [
     '--with-coverage',
     '--cover-package=users,todos,projects',
 ]
+
+DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
