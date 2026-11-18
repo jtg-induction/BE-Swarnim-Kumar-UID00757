@@ -11,6 +11,10 @@ https://docs.djangoproject.com/en/1.9/ref/settings/
 """
 
 import os
+from dotenv import load_dotenv
+
+load_dotenv()
+
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
@@ -20,7 +24,7 @@ BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 # See https://docs.djangoproject.com/en/1.9/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'k8b^y952f(10ox6993@h0q3-+&d_r#-g!qu+1zpggva_kux)2x'
+SECRET_KEY = os.getenv('SECRET_KEY')
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
@@ -47,7 +51,7 @@ INSTALLED_APPS = [
 
     'django_nose'
 ]
-AUTH_USER_MODEL = u'users.CustomUser'
+AUTH_USER_MODEL = 'users.CustomUser'
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
@@ -77,8 +81,6 @@ TEMPLATES = [
     },
 ]
 
-TEMPLATE_DEBUG = DEBUG
-
 WSGI_APPLICATION = 'todoapp.wsgi.application'
 
 
@@ -86,13 +88,13 @@ WSGI_APPLICATION = 'todoapp.wsgi.application'
 # https://docs.djangoproject.com/en/1.9/ref/settings/#databases
 
 DATABASES = {
-    u'default': {
-        u'ENGINE': u'django.db.backends.postgresql',
-        u'NAME': u'',                      # Add database name.
-        u'USER': u'postgres',              # Add psql user name. For default use postgres.
-        u'PASSWORD': u'',                  # Add user password if exists.
-        u'HOST': u'',                      # Set to empty string for localhost..
-        u'PORT': u'5432',                  # Psql service running port.
+    'default': {
+        'ENGINE': 'django.db.backends.postgresql',
+        'NAME': os.getenv('DB_NAME'),                      # Add database name.
+        'USER': os.getenv('DB_USER'),              # Add psql user name. For default use postgres.
+        'PASSWORD': os.getenv('DB_USER_PASSWORD'),                  # Add user password if exists.
+        'HOST': os.getenv('DB_HOST'),                      # Set to empty string for localhost..
+        'PORT': os.getenv('DB_PORT'),                  # Psql service running port.
     },
 }
 
@@ -153,3 +155,5 @@ NOSE_ARGS = [
     '--with-coverage',
     '--cover-package=users,todos,projects',
 ]
+
+DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
